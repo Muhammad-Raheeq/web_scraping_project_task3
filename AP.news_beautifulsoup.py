@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import csv
 from datetime import datetime
+import pandas as pd
+import os
 
 results = []
 for i in range(1,20):
@@ -37,3 +39,11 @@ with open("apnews_war_articles.csv", mode="w", newline='', encoding='utf-8') as 
     writer = csv.writer(f)
     writer.writerow(["headline","date", "url", "description"])
     writer.writerows(results)
+
+df = pd.read_csv("apnews_war_articles.csv")
+df.drop_duplicates(subset=["title"], inplace=True)
+df.to_csv("apnews_war_articles.csv", index=False)
+
+print("Duplicates removed and final data saved.")
+
+

@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import csv
 import time
 from datetime import datetime
+import pandas as pd
 
 options = Options()
 options.add_argument("--headless")
@@ -22,11 +23,12 @@ for i in range(1,20):
      desc_tag = article.find(class_="PagePromo-description")
      link_tag = article.find('a')
      time_tag = article.find('bsp-timestamp')
-     title = title_tag.get_text(strip=True) if title_tag else "No title"
-     link = link_tag['href'] if link_tag else "No link"
-     description = desc_tag.get_text(strip=True) if desc_tag else "No description"
-     full_link = f"https://apnews.com{link}" if link.startswith("/") else link
-     if time_tag:
+     if time_tag and title_tag:
+         title = title_tag.get_text(strip=True) if title_tag else "No title"
+         link = link_tag['href'] if link_tag else "No link"
+         description = desc_tag.get_text(strip=True) if desc_tag else "No description"
+         full_link = f"https://apnews.com{link}" if link.startswith("/") else link
+     
          date_str = time_tag['data-timestamp']
          date_str_2= int(date_str)
          date_have=date_str_2 / 1000
@@ -41,3 +43,7 @@ for i in range(1,20):
         writer.writerows(data)
 print("data saved to apnews.csv")
 driver.quit()
+
+df = pd.read_csv("apnews.csv")
+df.drop_duplicates(inplace=True)
+df.to_csv("apnews.csv", index=False)
